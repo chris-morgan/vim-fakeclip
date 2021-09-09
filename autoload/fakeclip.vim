@@ -29,6 +29,8 @@ elseif system('cat /proc/sys/kernel/osrelease') =~? 'Microsoft'
   let s:PLATFORM = 'wsl'
 elseif has('win32unix')
   let s:PLATFORM = 'cygwin'
+elseif $WAYLAND_DISPLAY != '' && executable('wl-copy')
+  let s:PLATFORM = 'wl_clipboard'
 elseif $DISPLAY != '' && executable('xclip')
   let s:PLATFORM = 'x'
 elseif executable('lemonade')
@@ -183,6 +185,11 @@ function! s:read_clipboard_cygwin()
 endfunction
 
 
+function! s:read_clipboard_wl_clipboard()
+  return system('wl-paste --no-newline')
+endfunction
+
+
 function! s:read_clipboard_x()
   return system('xclip -o')
 endfunction
@@ -263,6 +270,12 @@ endfunction
 
 function! s:write_clipboard_cygwin(text)
   call writefile(split(a:text, "\x0A", 1), '/dev/clipboard', 'b')
+  return
+endfunction
+
+
+function! s:write_clipboard_wl_clipboard(text)
+  call system('wl-copy', a:text)
   return
 endfunction
 
