@@ -33,6 +33,8 @@ elseif $WAYLAND_DISPLAY != '' && executable('wl-copy')
   let s:PLATFORM = 'wl_clipboard'
 elseif $DISPLAY != '' && executable('xclip')
   let s:PLATFORM = 'x'
+elseif executable('termux-clipboard-get')
+  let s:PLATFORM = 'termux'
 elseif executable('lemonade')
   let s:PLATFORM = 'lemonade'
 else
@@ -195,6 +197,11 @@ function! s:read_clipboard_x()
 endfunction
 
 
+function! s:read_clipboard_termux()
+  return system('termux-clipboard-get')
+endfunction
+
+
 function! s:read_clipboard_lemonade()
   return system('lemonade paste')
 endfunction
@@ -282,6 +289,12 @@ endfunction
 
 function! s:write_clipboard_x(text)
   call system('xclip', a:text)
+  return
+endfunction
+
+
+function! s:write_clipboard_termux(text)
+  call system('termux-clipboard-set', a:text)
   return
 endfunction
 
